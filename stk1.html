@@ -42,8 +42,8 @@ document.addEventListener("DOMContentLoaded", function () {
         audioTimePin.classList.add("pin-reproduzido");
       }
         if (audioRep) {
-        audioTotal.classList.toggle("oculto");
-        audioRep.classList.toggle("oculto");
+        audioTotal.classList.remove("oculto");
+        audioRep.classList.add("oculto");
       }
     });
   }
@@ -266,7 +266,7 @@ function changePlayPauseIcon(play = false) {
 .c-wa-audio__time-container {
   font-size: 16px;
   line-height: 18px;
-  color: #55606e;
+  color: #fff;
   display: flex;
   flex-grow: 1;
   justify-content: space-between;
@@ -299,8 +299,7 @@ function changePlayPauseIcon(play = false) {
   height: 13px;
   width: 13px;
   border-radius: 50%;
-  background-color: #ffffff4D;
-    border: 1px solid #fff;
+  background-color: #fff;
   position: absolute;
   pointer-events: all;
   top: -4px;
