@@ -30,6 +30,8 @@ document.addEventListener("DOMContentLoaded", function () {
   var audioPlayButton = document.querySelector(".c-wa-audio__control-play");
   var audioPhotoMic = document.querySelector(".c-wa-audio__photo-mic");
   var audioTimePin = document.querySelector(".c-wa-audio__time-pin");
+  var audioTotal = document.querySelector(".c-wa-audio__time-total");
+  var audioRep = document.querySelector(".c-wa-audio__time-current");
 
   if (audioPlayButton) {
     audioPlayButton.addEventListener("click", function () {
@@ -38,6 +40,10 @@ document.addEventListener("DOMContentLoaded", function () {
       }
       if (audioTimePin) {
         audioTimePin.classList.add("pin-reproduzido");
+      }
+        if (audioRep) {
+        audioTotal.classList.toggle("oculto");
+        audioRep.classList.toggle("oculto");
       }
     });
   }
