@@ -1,0 +1,317 @@
+<script src="https://kit.fontawesome.com/2bdb1da3d8.js" crossorigin="anonymous"></script>
+
+<div class="c-wa-audio">
+    <div class="c-wa-audio__wrapper">
+    <div class="c-wa-audio__photo-container">
+        <div class="c-wa-audio__photo"></div>
+        <i class="c-wa-audio__photo-mic fas fa-microphone"></i>
+    </div>
+    <div class="c-wa-audio__control-container">
+        <i class="c-wa-audio__control-play fas fa-play"></i>
+    </div>
+    <div class="c-wa-audio__time-container">
+        <div class="c-wa-audio__time-slider" data-direction="horizontal">
+        <div class="c-wa-audio__time-progress">
+            <div class="c-wa-audio__time-pin" id="progress-pin" data-method="rewind"></div>
+        </div>
+        </div>
+        <span class="c-wa-audio__time-current oculto">0:00</span>
+        <span class="c-wa-audio__time-total">0:14</span>
+    </div>
+    </div>
+    <audio crossorigin>
+    <source type="audio/mpeg" src="https://verificatypebot.github.io/audios/achei-grupo.mp3"></source>
+    </audio>
+</div>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  var audioPlayButton = document.querySelector(".c-wa-audio__control-play");
+  var audioPhotoMic = document.querySelector(".c-wa-audio__photo-mic");
+  var audioTimePin = document.querySelector(".c-wa-audio__time-pin");
+  var audioTotal = document.querySelector(".c-wa-audio__time-total");
+  var audioRep = document.querySelector(".c-wa-audio__time-current");
+
+  if (audioPlayButton) {
+    audioPlayButton.addEventListener("click", function () {
+      if (audioPhotoMic) {
+        audioPhotoMic.classList.add("reproduzido");
+      }
+      if (audioTimePin) {
+        audioTimePin.classList.add("pin-reproduzido");
+      }
+        if (audioRep) {
+        audioTotal.classList.add("oculto");
+        audioRep.classList.remove("oculto");
+      }
+    });
+  }
+});
+
+
+
+// Configurações do Player de Áudio
+   const audioWrapper = document.querySelector(".c-wa-audio");
+const playPause = document.querySelector(".c-wa-audio__control-play");
+const playpauseBtn = document.querySelector(".c-wa-audio__control-play");
+const progress = document.querySelector(".c-wa-audio__time-progress");
+const sliders = document.querySelectorAll(".c-wa-audio__time-slider");
+const player = document.querySelector("audio");
+const currentTime = document.querySelector(".c-wa-audio__time-current");
+const totalTime = document.querySelector(".c-wa-audio__time-total");
+
+let draggableClasses = ["c-wa-audio__time-pin"];
+let currentlyDragged = null;
+
+window.addEventListener("mousedown", function (event) {
+  if (!isDraggable(event.target)) return false;
+
+  currentlyDragged = event.target;
+  let handleMethod = currentlyDragged.dataset.method;
+
+  this.addEventListener("mousemove", window[handleMethod], false);
+
+  window.addEventListener(
+    "mouseup",
+    () => {
+      currentlyDragged = false;
+      window.removeEventListener("mousemove", window[handleMethod], false);
+    },
+    false
+  );
+});
+
+playpauseBtn.addEventListener("click", togglePlay);
+player.addEventListener("timeupdate", updateProgress);
+player.addEventListener("loadedmetadata", () => {
+  totalTime.textContent = formatTime(player.duration);
+});
+player.addEventListener("canplay", makePlay);
+player.addEventListener("ended", function () {
+  changePlayPauseIcon(true);
+  player.currentTime = 0;
+});
+
+sliders.forEach((slider) => {
+  let pin = slider.querySelector(".c-wa-audio__time-pin");
+  slider.addEventListener("click", window[pin.dataset.method]);
+});
+
+function isDraggable(el) {
+  let canDrag = false;
+  let classes = Array.from(el.classList);
+  draggableClasses.forEach((draggable) => {
+    if (classes.indexOf(draggable) !== -1) canDrag = true;
+  });
+
+  return canDrag;
+}
+
+function inRange(event) {
+  let rangeBox = getRangeBox(event);
+  let rect = rangeBox.getBoundingClientRect();
+  let direction = rangeBox.dataset.direction;
+  console.warn(direction);
+
+  if (direction == "horizontal") {
+    const min = 0;
+    const max = rect.width;
+    const clientX = event.clientX - rect.left;
+
+    if (clientX < min || clientX > max) return false;
+  } else {
+    var min = rect.top;
+    var max = min + rangeBox.offsetHeight;
+    if (event.clientY < min || event.clientY > max) return false;
+  }
+  return true;
+}
+
+function updateProgress() {
+  const current = player.currentTime;
+  const percent = (current / player.duration) * 100;
+  progress.style.width = percent + "%";
+
+  currentTime.textContent = formatTime(current);
+}
+
+function getRangeBox(event) {
+  let rangeBox = event.target;
+  let el = currentlyDragged;
+  if (event.type == "click" && isDraggable(event.target)) {
+    rangeBox = event.target.parentElement.parentElement;
+  }
+  if (event.type == "mousemove") {
+    rangeBox = el.parentElement.parentElement;
+  }
+  return rangeBox;
+}
+
+function getCoefficient(event) {
+  let slider = getRangeBox(event);
+  let rect = slider.getBoundingClientRect();
+  let K = 0;
+  if (slider.dataset.direction == "horizontal") {
+    const offsetX = event.clientX - rect.left;
+    let width = slider.clientWidth;
+    K = offsetX / width;
+  } else if (slider.dataset.direction == "vertical") {
+    let height = slider.clientHeight;
+    var offsetY = event.clientY - rect.top;
+    K = 1 - offsetY / height;
+  }
+
+  return K;
+}
+
+function rewind(event) {
+  console.warn("a");
+  if (inRange(event)) {
+    player.currentTime = player.duration * getCoefficient(event);
+  }
+}
+
+function formatTime(time) {
+  var min = Math.floor(time / 60);
+  var sec = Math.floor(time % 60);
+  return min + ":" + (sec < 10 ? "0" + sec : sec);
+}
+
+function togglePlay() {
+  if (player.paused) {
+    changePlayPauseIcon(false);
+    player.play();
+  } else {
+    changePlayPauseIcon(true);
+    player.pause();
+  }
+}
+
+function makePlay() {
+  playpauseBtn.style.display = "block";
+}
+
+function changePlayPauseIcon(play = false) {
+  if (play) {
+    playPause.classList.remove("fa-pause");
+    playPause.classList.add("fa-play");
+  } else {
+    playPause.classList.remove("fa-play");
+    playPause.classList.add("fa-pause");
+  }
+}
+
+// fim das configurações do player de áudio
+
+</script>
+
+
+<style>
+
+  /* CSS Player de Áudio */
+
+  @import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400&display=swap');
+.c-wa-audio__wrapper {
+  display: flex;
+  align-items: center;
+  max-width: 100vw;
+  width: 280px;
+}
+
+/* SUA FOTO DE PERFIL */
+.c-wa-audio__photo {
+  background-image:
+  url(https://i.ibb.co/KmP4Lpz/duda.jpg);
+  background-position: center;
+  background-size: cover;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+}
+
+.c-wa-audio__photo-container {
+  position: relative;
+}
+
+.c-wa-audio__photo-mic {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  font-size: 1.1rem;
+  color: #fff;
+ /* filter: drop-shadow(1px 1px 0 white) drop-shadow(-1px -1px 0 white);*/
+}
+
+.reproduzido {
+  color: #2AB5EB !important;
+  transition: .2s easy;
+}
+
+.pin-reproduzido {
+  background-color: #2AB5EB !important;
+  transition: .2s easy;
+}
+
+.c-wa-audio__control-container {
+    margin-right: -20px;
+}
+.c-wa-audio__control-play {
+  color: #fff;
+  margin-left: 20px;
+  cursor: pointer;
+  font-size: 1.1rem;
+}
+
+.c-wa-audio__time-container {
+  font-size: 16px;
+  line-height: 18px;
+  color: #fff;
+  display: flex;
+  flex-grow: 1;
+  justify-content: space-between;
+  align-items: center;
+  margin-left: 24px;
+  margin-right: 0;
+  font-family:Lato;
+}
+
+.c-wa-audio__time-slider {
+  flex-grow: 1;
+  background-color: #d8d8d8;
+  cursor: pointer;
+  position: relative;
+  margin-left: 16px;
+  margin-right: 16px;
+  border-radius: 2px;
+  height: 4px;
+}
+
+.c-wa-audio__time-progress {
+  background-color: #2ab5eb;
+  border-radius: inherit;
+  position: absolute;
+  pointer-events: none;
+  height: 4px;
+}
+
+.c-wa-audio__time-pin {
+  height: 13px;
+  width: 13px;
+  border-radius: 50%;
+  background-color: #fff;
+  position: absolute;
+  pointer-events: all;
+  top: -4px;
+  right: -10px;
+  box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.32);
+}
+.oculto{
+  display: none!important;
+}
+body{
+    margin:0px!important;
+    background: rgba(110,93,231,1);
+    background: linear-gradient(142deg, rgba(110,93,231,1) 0%, rgba(122,69,200,1) 100%)!important;
+}
+</style>
