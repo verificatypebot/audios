@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://kit.fontawesome.com/2bdb1da3d8.js" crossorigin="anonymous"></script>
+
+</head>
+<body>
+    <style>@import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400&display=swap');</style>
+    <div id="audio-player-container"></div>
+</body>
+</html>
+
+
+
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Criação de elementos HTML para o player de áudio
+    const audioPlayerContainer = document.getElementById('audio-player-container');
+    
+    const container = document.createElement('div');
+    container.className = 'c-wa-audio';
+    audioPlayerContainer.appendChild(container);
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'c-wa-audio__wrapper';
+    container.appendChild(wrapper);
+
+    const photoContainer = document.createElement('div');
+    photoContainer.className = 'c-wa-audio__photo-container';
+    wrapper.appendChild(photoContainer);
+
+    const photo = document.createElement('div');
+    photo.className = 'c-wa-audio__photo';
+    photoContainer.appendChild(photo);
+
+    const audioPhotoMic = document.createElement('i');
+    audioPhotoMic.className = 'c-wa-audio__photo-mic fas fa-microphone';
+    photoContainer.appendChild(audioPhotoMic);
+
+    const controlContainer = document.createElement('div');
+    controlContainer.className = 'c-wa-audio__control-container';
+    wrapper.appendChild(controlContainer);
+
+    const audioPlayButton = document.createElement('i');
+    audioPlayButton.className = 'c-wa-audio__control-play fas fa-play';
+    controlContainer.appendChild(audioPlayButton);
+
+    const timeContainer = document.createElement('div');
+    timeContainer.className = 'c-wa-audio__time-container';
+    wrapper.appendChild(timeContainer);
+
+    const timeSlider = document.createElement('div');
+    timeSlider.className = 'c-wa-audio__time-slider';
+    timeSlider.setAttribute('data-direction', 'horizontal');
+    timeContainer.appendChild(timeSlider);
+
+    const timeProgress = document.createElement('div');
+    timeProgress.className = 'c-wa-audio__time-progress';
+    timeSlider.appendChild(timeProgress);
+
+    const audioTimePin = document.createElement('div');
+    audioTimePin.className = 'c-wa-audio__time-pin';
+    audioTimePin.id = 'progress-pin';
+    audioTimePin.setAttribute('data-method', 'rewind');
+    timeProgress.appendChild(audioTimePin);
+
+    const audioCurrent = document.createElement('span');
+    audioCurrent.className = 'c-wa-audio__time-current oculto';
+    audioCurrent.textContent = '0:00';
+    timeContainer.appendChild(audioCurrent);
+
+    const audioTotal = document.createElement('span');
+    audioTotal.className = 'c-wa-audio__time-total';
+    audioTotal.textContent = '0:00';
+    timeContainer.appendChild(audioTotal);
+
+    const audioElement = document.createElement('audio');
+    audioElement.crossOrigin = 'anonymous';
+    container.appendChild(audioElement);
+
+    const sourceElement = document.createElement('source');
+    sourceElement.type = 'audio/mpeg';
+    sourceElement.src = 'https://verificatypebot.github.io/audios/audio-modelo.mp3';
+    audioElement.appendChild(sourceElement);
+
+    // Criação de estilos CSS
+    const cssStyles = `
+    .c-wa-audio__wrapper {
+  display: flex;
+  align-items: center;
+  max-width: 100vw;
+  width: 280px;
+}
+
+/* SUA FOTO DE PERFIL */
+.c-wa-audio__photo {
+  background-image:
+  url(https://i.ibb.co/KmP4Lpz/duda.jpg);
+  background-position: center;
+  background-size: cover;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+}
+
+.c-wa-audio__photo-container {
+  position: relative;
+}
+
+.c-wa-audio__photo-mic {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  font-size: 1.1rem;
+  color: #fff;
+ /* filter: drop-shadow(1px 1px 0 white) drop-shadow(-1px -1px 0 white);*/
+}
+
+.reproduzido {
+  color: #2AB5EB !important;
+  transition: .2s easy;
+}
+
+.pin-reproduzido {
+  background-color: #2AB5EB !important;
+  transition: .2s easy;
+}
+
+.c-wa-audio__control-container {
+    margin-right: -20px;
+}
+.c-wa-audio__control-play {
+  color: #fff;
+  margin-left: 20px;
+  cursor: pointer;
+  font-size: 1.1rem;
+}
+
+.c-wa-audio__time-container {
+  font-size: 16px;
+  line-height: 18px;
+  color: #fff;
+  display: flex;
+  flex-grow: 1;
+  justify-content: space-between;
+  align-items: center;
+  margin-left: 24px;
+  margin-right: 0;
+  font-family:Lato;
+}
+
+.c-wa-audio__time-slider {
+  flex-grow: 1;
+  background-color: #d8d8d8;
+  cursor: pointer;
+  position: relative;
+  margin-left: 16px;
+  margin-right: 16px;
+  border-radius: 2px;
+  height: 4px;
+}
+
+.c-wa-audio__time-progress {
+  background-color: #2ab5eb;
+  border-radius: inherit;
+  position: absolute;
+  pointer-events: none;
+  height: 4px;
+}
+
+.c-wa-audio__time-pin {
+  height: 13px;
+  width: 13px;
+  border-radius: 50%;
+  background-color: #fff;
+  position: absolute;
+  pointer-events: all;
+  top: -4px;
+  right: -10px;
+  box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.32);
+}
+.oculto{
+  display: none!important;
+}
+body{
+    margin:0px!important;
+    background: rgba(110,93,231,1);
+    background: linear-gradient(142deg, rgba(110,93,231,1) 0%, rgba(122,69,200,1) 100%)!important;
+}
+    `;
+
+    const styleSheet = document.createElement('style');
+    styleSheet.type = 'text/css';
+    styleSheet.innerText = cssStyles;
+    document.head.appendChild(styleSheet);
+
+    // Adicionando o script Font Awesome para ícones
+    const fontAwesomeScript = document.createElement('script');
+    fontAwesomeScript.src = 'https://kit.fontawesome.com/2bdb1da3d8.js';
+    fontAwesomeScript.crossOrigin = 'anonymous';
+    document.body.appendChild(fontAwesomeScript);
+
+    document.addEventListener("DOMContentLoaded", function () {
+  var audioPlayButton = document.querySelector(".c-wa-audio__control-play");
+  var audioPhotoMic = document.querySelector(".c-wa-audio__photo-mic");
+  var audioTimePin = document.querySelector(".c-wa-audio__time-pin");
+  var audioTotal = document.querySelector(".c-wa-audio__time-total");
+  var audioRep = document.querySelector(".c-wa-audio__time-current");
+
+  if (audioPlayButton) {
+    audioPlayButton.addEventListener("click", function () {
+      if (audioPhotoMic) {
+        audioPhotoMic.classList.add("reproduzido");
+      }
+      if (audioTimePin) {
+        audioTimePin.classList.add("pin-reproduzido");
+      }
+        if (audioRep) {
+        audioTotal.classList.add("oculto");
+        audioRep.classList.remove("oculto");
+      }
+    });
+  }
+});
+
+
+
+// Configurações do Player de Áudio
+   const audioWrapper = document.querySelector(".c-wa-audio");
+const playPause = document.querySelector(".c-wa-audio__control-play");
+const playpauseBtn = document.querySelector(".c-wa-audio__control-play");
+const progress = document.querySelector(".c-wa-audio__time-progress");
+const sliders = document.querySelectorAll(".c-wa-audio__time-slider");
+const player = document.querySelector("audio");
+const currentTime = document.querySelector(".c-wa-audio__time-current");
+const totalTime = document.querySelector(".c-wa-audio__time-total");
+
+let draggableClasses = ["c-wa-audio__time-pin"];
+let currentlyDragged = null;
+
+window.addEventListener("mousedown", function (event) {
+  if (!isDraggable(event.target)) return false;
+
+  currentlyDragged = event.target;
+  let handleMethod = currentlyDragged.dataset.method;
+
+  this.addEventListener("mousemove", window[handleMethod], false);
+
+  window.addEventListener(
+    "mouseup",
+    () => {
+      currentlyDragged = false;
+      window.removeEventListener("mousemove", window[handleMethod], false);
+    },
+    false
+  );
+});
+
+playpauseBtn.addEventListener("click", togglePlay);
+player.addEventListener("timeupdate", updateProgress);
+player.addEventListener("loadedmetadata", () => {
+  totalTime.textContent = formatTime(player.duration);
+});
+player.addEventListener("canplay", makePlay);
+player.addEventListener("ended", function () {
+  changePlayPauseIcon(true);
+  player.currentTime = 0;
+});
+
+sliders.forEach((slider) => {
+  let pin = slider.querySelector(".c-wa-audio__time-pin");
+  slider.addEventListener("click", window[pin.dataset.method]);
+});
+
+function isDraggable(el) {
+  let canDrag = false;
+  let classes = Array.from(el.classList);
+  draggableClasses.forEach((draggable) => {
+    if (classes.indexOf(draggable) !== -1) canDrag = true;
+  });
+
+  return canDrag;
+}
+
+function inRange(event) {
+  let rangeBox = getRangeBox(event);
+  let rect = rangeBox.getBoundingClientRect();
+  let direction = rangeBox.dataset.direction;
+  console.warn(direction);
+
+  if (direction == "horizontal") {
+    const min = 0;
+    const max = rect.width;
+    const clientX = event.clientX - rect.left;
+
+    if (clientX < min || clientX > max) return false;
+  } else {
+    var min = rect.top;
+    var max = min + rangeBox.offsetHeight;
+    if (event.clientY < min || event.clientY > max) return false;
+  }
+  return true;
+}
+
+function updateProgress() {
+  const current = player.currentTime;
+  const percent = (current / player.duration) * 100;
+  progress.style.width = percent + "%";
+
+  currentTime.textContent = formatTime(current);
+}
+
+function getRangeBox(event) {
+  let rangeBox = event.target;
+  let el = currentlyDragged;
+  if (event.type == "click" && isDraggable(event.target)) {
+    rangeBox = event.target.parentElement.parentElement;
+  }
+  if (event.type == "mousemove") {
+    rangeBox = el.parentElement.parentElement;
+  }
+  return rangeBox;
+}
+
+function getCoefficient(event) {
+  let slider = getRangeBox(event);
+  let rect = slider.getBoundingClientRect();
+  let K = 0;
+  if (slider.dataset.direction == "horizontal") {
+    const offsetX = event.clientX - rect.left;
+    let width = slider.clientWidth;
+    K = offsetX / width;
+  } else if (slider.dataset.direction == "vertical") {
+    let height = slider.clientHeight;
+    var offsetY = event.clientY - rect.top;
+    K = 1 - offsetY / height;
+  }
+
+  return K;
+}
+
+function rewind(event) {
+  console.warn("a");
+  if (inRange(event)) {
+    player.currentTime = player.duration * getCoefficient(event);
+  }
+}
+
+function formatTime(time) {
+  var min = Math.floor(time / 60);
+  var sec = Math.floor(time % 60);
+  return min + ":" + (sec < 10 ? "0" + sec : sec);
+}
+
+function togglePlay() {
+  if (player.paused) {
+    changePlayPauseIcon(false);
+    player.play();
+  } else {
+    changePlayPauseIcon(true);
+    player.pause();
+  }
+}
+
+function makePlay() {
+  playpauseBtn.style.display = "block";
+}
+
+function changePlayPauseIcon(play = false) {
+  if (play) {
+    playPause.classList.remove("fa-pause");
+    playPause.classList.add("fa-play");
+  } else {
+    playPause.classList.remove("fa-play");
+    playPause.classList.add("fa-pause");
+  }
+}
+});
+
+</script>
