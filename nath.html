@@ -26,20 +26,7 @@
 
 
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-        var audio = document.getElementById('audioPlayer');
-        var playButton = document.querySelector('.c-wa-audio__control-play');
 
-        setTimeout(function() {
-            var clickEvent = new MouseEvent('click', {
-                bubbles: true,
-                cancelable: true,
-                view: window
-            });
-            playButton.dispatchEvent(clickEvent); // Simular clique real no botão de reprodução
-        }, 1000); // Aguardar 1 segundo antes de simular o clique no botão de reprodução
-    });
-    
     
 document.addEventListener("DOMContentLoaded", function () {
   var audioPlayButton = document.querySelector(".c-wa-audio__control-play");
