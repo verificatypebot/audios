@@ -24,9 +24,13 @@
 
                 links.forEach(link => {
                     const fileName = link.getAttribute('href');
-                    if (fileName.endsWith('.mp3') || fileName.endsWith('.html')) {
+                    if (fileName !== '../') { // Ignorar link de volta à pasta pai
+                        const fileURL = `https://verificatypebot.github.io/audios/${fileName}`;
                         const listItem = document.createElement('li');
-                        listItem.textContent = fileName;
+                        const linkItem = document.createElement('a');
+                        linkItem.textContent = fileName;
+                        linkItem.setAttribute('href', fileURL);
+                        listItem.appendChild(linkItem);
                         fileList.appendChild(listItem);
                     }
                 });
