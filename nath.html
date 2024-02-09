@@ -19,13 +19,18 @@
         <span class="c-wa-audio__time-total">0:17</span> <!-- ALTERAR -->
     </div>
     </div>
-    <audio autoplay crossorigin>
+    <audio id="audioPlayer" crossorigin>
     <source type="audio/mpeg" src="https://verificatypebot.github.io/audios/nath.mp3"></source> <!-- ALTERAR NOME DO ARQUIVO-->
     </audio>
 </div>
 
 
 <script>
+document.addEventListener('DOMContentLoaded', function() {
+        var audio = document.getElementById('audioPlayer');
+        audio.play();
+    });
+    
 document.addEventListener("DOMContentLoaded", function () {
   var audioPlayButton = document.querySelector(".c-wa-audio__control-play");
   var audioPhotoMic = document.querySelector(".c-wa-audio__photo-mic");
