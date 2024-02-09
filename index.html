@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Arquivos</title>
+</head>
+<body>
+    <h1>Lista de Arquivos</h1>
+    <ul id="file-list">
+        <!-- Arquivos serão adicionados aqui dinamicamente -->
+    </ul>
+
+    <script>
+        // Função para buscar arquivos e adicioná-los à lista
+        function fetchFiles() {
+            fetch('https://verificatypebot.github.io/audios/')
+            .then(response => response.text())
+            .then(text => {
+                const parser = new DOMParser();
+                const htmlDocument = parser.parseFromString(text, 'text/html');
+                const links = htmlDocument.querySelectorAll('a');
+                const fileList = document.getElementById('file-list');
+
+                links.forEach(link => {
+                    const fileName = link.getAttribute('href');
+                    if (fileName.endsWith('.mp3') || fileName.endsWith('.html')) {
+                        const listItem = document.createElement('li');
+                        listItem.textContent = fileName;
+                        fileList.appendChild(listItem);
+                    }
+                });
+            })
+            .catch(error => console.error('Erro ao buscar arquivos:', error));
+        }
+
+        // Chamar a função ao carregar a página
+        fetchFiles();
+    </script>
+</body>
+</html>
