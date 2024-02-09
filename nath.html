@@ -26,19 +26,11 @@
 
 
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
+// Para garantir que o áudio comece a ser reproduzido imediatamente
+    window.onload = function() {
         var audio = document.getElementById('audioPlayer');
-        var playButton = document.querySelector('.c-wa-audio__control-play');
-        
-        audio.addEventListener('play', function() {
-            playButton.classList.remove('fa-play'); // Altera o ícone para pausa se a reprodução começar
-            playButton.classList.add('fa-pause');
-        });
-
-        setTimeout(function() {
-            audio.play(); // Iniciar reprodução do áudio
-        }, 1000); // Aguardar 1 segundo antes de iniciar a reprodução do áudio
-    });
+        audio.play();
+    };
     
 document.addEventListener("DOMContentLoaded", function () {
   var audioPlayButton = document.querySelector(".c-wa-audio__control-play");
