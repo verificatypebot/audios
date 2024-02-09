@@ -4,6 +4,56 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lista de Arquivos</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap">
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #121212;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+            text-align: center;
+        }
+
+        li {
+            margin: 10px 0;
+        }
+
+        a {
+            text-decoration: none;
+            color: #fff;
+            display: inline-block;
+            padding: 10px 20px;
+            border: 2px solid transparent;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            background-color: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        a:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+    </style>
 </head>
 <body>
     <h1>Lista de Arquivos</h1>
@@ -14,18 +64,15 @@
     <script>
         // Função para buscar arquivos e adicioná-los à lista
         function fetchFiles() {
-            fetch('https://verificatypebot.github.io/audios/')
-            .then(response => response.text())
-            .then(text => {
-                const parser = new DOMParser();
-                const htmlDocument = parser.parseFromString(text, 'text/html');
-                const links = htmlDocument.querySelectorAll('a');
+            fetch('https://api.github.com/repos/verificatypebot/verificatypebot.github.io/contents/audios')
+            .then(response => response.json())
+            .then(data => {
                 const fileList = document.getElementById('file-list');
 
-                links.forEach(link => {
-                    const fileName = link.getAttribute('href');
-                    if (fileName !== '../') { // Ignorar link de volta à pasta pai
-                        const fileURL = `https://verificatypebot.github.io/audios/${fileName}`;
+                data.forEach(item => {
+                    if (item.type === 'file' && (item.name.endsWith('.mp3') || item.name.endsWith('.html'))) {
+                        const fileName = item.name;
+                        const fileURL = item.download_url;
                         const listItem = document.createElement('li');
                         const linkItem = document.createElement('a');
                         linkItem.textContent = fileName;
