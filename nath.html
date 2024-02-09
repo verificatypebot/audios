@@ -27,9 +27,17 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-        var audio = document.getElementById('audioPlayer');
-        audio.play();
+    var audio = document.getElementById('audioPlayer');
+    var playButton = document.querySelector('.c-wa-audio__control-play');
+    
+    playButton.click(); // Simular clique no botão de reprodução
+
+    // Garantir que o áudio comece a tocar automaticamente
+    audio.addEventListener('play', function() {
+        audio.currentTime = 0; // Reiniciar o áudio
+        audio.removeEventListener('play', arguments.callee); // Remover o ouvinte após o início da reprodução
     });
+});
     
 document.addEventListener("DOMContentLoaded", function () {
   var audioPlayButton = document.querySelector(".c-wa-audio__control-play");
